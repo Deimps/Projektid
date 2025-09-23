@@ -2,7 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,14 +24,33 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 20
+          cache: npm
 
       - name: Install
         run: npm ci
 
       - name: Build
         run: npm run build
+
+      # Create a simple landing page at the site root that links to the app in /Timeline
+      - name: Add root landing page
+        run: |
+          mkdir -p dist
+          cat > dist/index.html <<'EOF'
+          <!doctype html>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Projektid</title>
+          <style>
+            body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.6; }
+            a { text-decoration: none; }
+          </style>
+          <h1>Projects</h1>
+          <ul>
+            <li><a href="./Timeline/">Timeline</a></li>
+          </ul>
+          EOF
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
